@@ -15,7 +15,6 @@
             color: #1F2937;
             -webkit-tap-highlight-color: transparent;
         }
-        .chart-container { position: relative; width: 100%; height: 250px; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -311,7 +310,7 @@
     <!-- Section: Data Analysis (Info only) -->
     <section id="analysis" class="py-10 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Mejora tu Pedido</h3>
+            <!-- Removed the chart section completely -->
             
             <div class="bg-white rounded-xl border-l-4 border-orange-500 p-4 shadow-sm flex items-center justify-between">
                 <div>
@@ -566,7 +565,7 @@
             { id: 3, name: "Atún", price: 22900, desc: "Pan Artesanal, Atún, Queso Gratinado, Salsas Lotto, 3 Vegetales Frescos.", cat: "sandwich", tags: [], emoji: "🐟" },
             { id: 4, name: "Vegetariano", price: 22900, desc: "100g Champiñones, Berenjenas Asadas, Huevo y Vegetales.", cat: "sandwich", tags: ["Nuevo"], emoji: "🍄" },
             { id: 5, name: "Fachero", price: 24900, desc: "Pan Artesanal, Res, Maíz Tierno, Chorizo, Queso Gratinado, 3 Vegetales.", cat: "sandwich", tags: [], emoji: "🌽" },
-            { id: 6, name: "Poderoso", price: 23900, desc: "Pan Artesanal, Pechuga, Huevo Frito, 3 Vegetales seleccionados.", cat: "sandwich", tags: [], emoji: "💪" },
+            { id: 6, name: "Poderoso", price: 23900, desc: "Pan Artesanal, Pechuga, tocineta, queso, Huevo Frito, 3 Vegetales.", cat: "sandwich", tags: [], emoji: "💪" },
             { id: 7, name: "Curado", price: 25900, desc: "Pan Artesanal, Rúgula, Tomates, Jamón Serrano, Tocineta, Queso Gratinado.", cat: "sandwich", tags: ["Premium"], emoji: "🍖" },
             { id: 8, name: "Sándwich de Huevo", price: 19900, desc: "Pan Burger, Huevos, Tocineta, Queso + Café.", cat: "sandwich", tags: ["Todo el día"], emoji: "🥪☕" },
             { id: 9, name: "Hamburguesa Lotto", price: 26900, desc: "Res, Cerdo, Tocineta, Queso Gratinado, 3 Vegetales.", cat: "burger", tags: [], emoji: "🍔" },
@@ -665,11 +664,10 @@
 
             const selectedSauces = Array.from(document.querySelectorAll('input[name="modal-sauce"]:checked')).map(cb => cb.value);
             
-            if(selectedSauces.length < 1) {
-               alert("Por favor selecciona al menos una salsa.");
-               return;
-            } // Min 1 enforced
-            
+            // if(selectedSauces.length < 1) {
+            //    alert("Por favor selecciona al menos una salsa.");
+            //    return;
+            // } // Min 0 allowed as per request
             if(selectedSauces.length > 3) {
                 alert("Puedes seleccionar máximo 3 salsas.");
                 return;
@@ -914,7 +912,7 @@
                 });
             });
         };
-        enforceLimit('protein', 2);
+        enforceLimit('protein', 3); // Changed to 3
         enforceLimit('sauce', 3);
         enforceLimit('veg', 3);
         
@@ -959,8 +957,8 @@
             const veg = Array.from(document.querySelectorAll('input[name="veg"]:checked')).map(c => c.value);
 
             if(!pan) { alert("Elige un pan (Paso 1)"); nextStep(1); return; }
-            if(proteins.length === 0) { alert("Elige al menos 1 proteína (Paso 2)"); nextStep(2); return; }
-            if(proteins.length > 2) { alert("Máximo 2 proteínas"); nextStep(2); return; }
+            
+            if(proteins.length > 3) { alert("Máximo 3 proteínas"); nextStep(2); return; } // Updated alert
             if(sauces.length > 3) { alert("Máximo 3 salsas"); nextStep(3); return; }
             if(veg.length > 3) { alert("Máximo 3 vegetales"); return; }
 
@@ -1084,7 +1082,24 @@
                     renderMenu(e.target.dataset.category);
                 });
             });
+            
+            // Modal Limits
+            const enforceModalLimit = (name, limit) => {
+                const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+                        if (checked.length > limit) {
+                            cb.checked = false;
+                            alert(`Máximo ${limit} opciones permitidas.`);
+                        }
+                    });
+                });
+            };
+            enforceModalLimit('modal-sauce', 3);
+            enforceModalLimit('modal-veg', 3);
         });
     </script>
 </body>
 </html>
+
